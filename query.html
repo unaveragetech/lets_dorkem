@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="https://example.com/">
+    <title>Q&AI Multi-Search with Enhanced Capabilities</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --input-bg: #1e1e1e;
+            --input-focus-bg: #2a2a2a;
+            --button-bg: #1e1e1e;
+            --button-hover-bg: #2a2a2a;
+        }
+        .light-mode {
+            --bg-color: #f0f0f0;
+            --text-color: #121212;
+            --input-bg: #ffffff;
+            --input-focus-bg: #e0e0e0;
+            --button-bg: #ffffff;
+            --button-hover-bg: #e0e0e0;
+        }
+        body, html {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+            height: 100%;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .search-container {
+            display: flex;
+            width: 75%;
+            max-width: 600px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 16px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px 0 0 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        #search-input:focus {
+            outline: none;
+            background-color: var(--input-focus-bg);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        #search-button {
+            background-color: var(--button-bg);
+            border: none;
+            border-radius: 0 12px 12px 0;
+            cursor: pointer;
+            padding: 0 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        #search-button:hover {
+            background-color: var(--button-hover-bg);
+        }
+        #search-button:active {
+            transform: scale(0.95);
+        }
+        .watermark {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+        .tagline {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--text-color);
+            letter-spacing: 0.5px;
+        }
+        .search-options {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-options label {
+            margin: 0 10px;
+        }
+        #autocomplete {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--input-bg);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        #autocomplete div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        #autocomplete div:hover {
+            background-color: var(--input-focus-bg);
+        }
+        #voice-search {
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        #mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .search-container {
+                width: 90%;
+            }
+            .tagline {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">Q&AI</div>
+    <button id="mode-toggle">🌓</button>
+    <div class="tagline">Search Everywhere, Answer Everything</div>
+    <div class="search-options">
+        <label><input type="checkbox" name="engine" value="google" checked> Google</label>
+        <label><input type="checkbox" name="engine" value="perplexity" checked> Perplexity AI</label>
+        <label><input type="checkbox" name="engine" value="bing"> Bing</label>
+        <label><input type="checkbox" name="engine" value="duckduckgo"> DuckDuckGo</label>
+        <label><input type="checkbox" name="engine" value="wikipedia"> Wikipedia</label>
+    </div>
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Enter your search query" autofocus>
+        <button id="voice-search">🎤</button>
+        <button id="search-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </button>
+        <div id="autocomplete"></div>
+    </div>
+    
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const voiceSearchButton = document.getElementById('voice-search');
+        const autocompleteDiv = document.getElementById('autocomplete');
+        const modeToggle = document.getElementById('mode-toggle');
+
+        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        searchInput.addEventListener('input', showAutocomplete);
+        voiceSearchButton.addEventListener('click', startVoiceSearch);
+        modeToggle.addEventListener('click', toggleMode);
+
+        function performSearch() {
+            let input = searchInput.value;
+            let query = input;
+            let searchEngines = getSelectedEngines();
+
+            if (input.startsWith('G-')) {
+                searchEngines = ['google'];
+                query = input.slice(2).trim();
+            } else if (input.startsWith('P-')) {
+                searchEngines = ['perplexity'];
+                query = input.slice(2).trim();
+            } else if (input.startsWith('B-')) {
+                searchEngines = ['bing'];
+                query = input.slice(2).trim();
+            } else if (input.startsWith('D-')) {
+                searchEngines = ['duckduckgo'];
+                query = input.slice(2).trim();
+            } else if (input.startsWith('W-')) {
+                searchEngines = ['wikipedia'];
+                query = input.slice(2).trim();
+            }
+
+            query = encodeURIComponent(query);
+
+            if (query) {
+                searchEngines.forEach(engine => {
+                    let url;
+                    switch(engine) {
+                        case 'google':
+                            url = `https://www.google.com/search?q=${query}`;
+                            break;
+                        case 'perplexity':
+                            url = `https://www.perplexity.ai/search/new?q=${query}`;
+                            break;
+                        case 'bing':
+                            url = `https://www.bing.com/search?q=${query}`;
+                            break;
+                        case 'duckduckgo':
+                            url = `https://duckduckgo.com/?q=${query}`;
+                            break;
+                        case 'wikipedia':
+                            url = `https://en.wikipedia.org/wiki/Special:Search?search=${query}`;
+                            break;
+                    }
+                    window.open(url, '_blank');
+                });
+
+                addToSearchHistory(input);
+            }
+        }
+
+        function getSelectedEngines() {
+            return Array.from(document.querySelectorAll('input[name="engine"]:checked')).map(input => input.value);
+        }
+
+        function showAutocomplete() {
+            const input = searchInput.value.toLowerCase();
+            if (input.length < 2) {
+                autocompleteDiv.innerHTML = '';
+                return;
+            }
+
+            const matches = searchHistory.filter(item => item.toLowerCase().includes(input));
+            autocompleteDiv.innerHTML = matches.map(item => `<div>${item}</div>`).join('');
+
+            autocompleteDiv.querySelectorAll('div').forEach(div => {
+                div.addEventListener('click', function() {
+                    searchInput.value = this.textContent;
+                    autocompleteDiv.innerHTML = '';
+                });
+            });
+        }
+
+        function addToSearchHistory(query) {
+            if (!searchHistory.includes(query)) {
+                searchHistory.unshift(query);
+                if (searchHistory.length > 10) {
+                    searchHistory.pop();
+                }
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            }
+        }
+
+        function startVoiceSearch() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                recognition.onresult = function(event) {
+                    searchInput.value = event.results[0][0].transcript;
+                    performSearch();
+                };
+            } else {
+                alert('Voice recognition is not supported in your browser.');
+            }
+        }
+
+        function toggleMode() {
+            document.body.classList.toggle('light-mode');
+            modeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
+        }
+    </script>
+</body>
+</html>
