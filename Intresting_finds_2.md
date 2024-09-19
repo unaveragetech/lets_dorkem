@@ -21,7 +21,7 @@ The [GnuCash logs](https://lists.gnucash.org/logs/) are especially useful for:
 - **Problem-Solving**: Learning from past conversations and solutions to common development challenges.
 - **Insight into Collaboration**: Understanding how developers and teams collaborated in an open-source environment.
 
-Below is an example of the search results:
+Below is an example of the query using the html provided:
 
 ![Google Dorking Logs Image](assets/img/IMG_7991.png)
 
