@@ -36,7 +36,7 @@ In addition to Google Dorks, this repository includes an **HTML-Based Search Eng
 - **Responsive Design**: Optimized for various screen sizes to ensure usability on both desktop and mobile devices.
 
 -Hosted the html here 
--[https://unaveragetech.github.io/Dorkem_html/]-
+-https://unaveragetech.github.io/Dorkem_html/
 ### Code Overview
 
 Here's a snippet from the provided HTML-based search engine code:
