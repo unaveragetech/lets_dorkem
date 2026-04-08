@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dorkem — Search Bridge</title>
+    <style>
+        :root {
+            --surface: #0d111b;
+            --surface-2: #131a2d;
+            --text: #e6edf7;
+            --muted: #8ca1c6;
+            --accent: #61dafb;
+            --accent-2: #6bffa6;
+            --border: rgba(255,255,255,0.08);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(180deg, #08101a 0%, #0b1423 100%);
+            color: var(--text);
+            padding: 32px 20px;
+        }
+        .shell { max-width: 900px; margin: 0 auto; }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand-icon {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 900; color: #0b1120;
+            flex-shrink: 0;
+        }
+        .header-text h1 { margin: 0; font-size: 1.1rem; }
+        .header-text p  { margin: 2px 0 0; color: var(--muted); font-size: .85rem; }
+        .query-pill {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(97,218,251,0.12);
+            border: 1px solid rgba(97,218,251,0.25);
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: .9rem;
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
+        #status {
+            padding: 14px 18px;
+            border-radius: 14px;
+            background: rgba(255,193,7,0.12);
+            border: 1px solid rgba(255,193,7,0.2);
+            color: #ffc107;
+            margin-bottom: 20px;
+            font-size: .9rem;
+        }
+        #status.done   { background: rgba(107,255,166,0.1); border-color: rgba(107,255,166,0.3); color: var(--accent-2); }
+        #status.error  { background: rgba(255,80,80,0.1);  border-color: rgba(255,80,80,0.3);   color: #ff6464; }
+        #status.blocked{ background: rgba(255,80,80,0.1);  border-color: rgba(255,80,80,0.3);   color: #ff9966; }
+        .spinner {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid rgba(255,193,7,0.3);
+            border-top-color: #ffc107;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #results { display: none; }
+        #results h2 { margin: 0 0 14px; font-size: 1.05rem; }
+        .result-item {
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 10px;
+        }
+        .result-item a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .97rem;
+            word-break: break-all;
+        }
+        .result-item a:hover { text-decoration: underline; }
+        .result-item .url  { color: var(--accent-2); font-size: .75rem; margin: 3px 0; word-break: break-all; }
+        .result-item .snip { color: var(--muted); font-size: .85rem; margin-top: 5px; line-height: 1.5; }
+        .open-btn {
+            margin-top: 20px;
+            padding: 12px 22px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #0b1120;
+            border: none;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: .9rem;
+        }
+        .open-btn:hover { opacity: .9; }
+        .no-results {
+            color: var(--muted);
+            font-style: italic;
+            padding: 14px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <div class="header">
+        <div class="brand-icon">D</div>
+        <div class="header-text">
+            <h1>Dorkem &mdash; Native Browser Search</h1>
+            <p>Fetching results through your local machine and reporting back to the AI agent.</p>
+        </div>
+    </div>
+
+    <div class="query-pill">
+        <span>&#128269;</span>
+        <span id="query-display">Loading…</span>
+    </div>
+
+    <div id="status"><span class="spinner"></span> Fetching search results…</div>
+
+    <div id="results">
+        <h2 id="results-heading">Results</h2>
+        <div id="results-list"></div>
+        <button class="open-btn" id="open-google-btn" style="display:none">
+            Open in Google &rarr;
+        </button>
+    </div>
+</div>
+
+<script>
+(async () => {
+    const params  = new URLSearchParams(window.location.search);
+    const query   = params.get('q') || '';
+    const jobId   = params.get('job_id') || '';
+    const si      = params.get('si') || '0';
+    const apiBase = window.location.origin;
+
+    const statusEl  = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+    const listEl    = document.getElementById('results-list');
+    const headingEl = document.getElementById('results-heading');
+    const openBtn   = document.getElementById('open-google-btn');
+    const queryDisp = document.getElementById('query-display');
+
+    queryDisp.textContent = decodeURIComponent(query.replace(/\+/g, ' '));
+    document.title = `Searching: ${queryDisp.textContent}`;
+
+    const googleUrl = `https://www.google.com/search?q=${query}&num=10`;
+
+    openBtn.style.display = 'inline-block';
+    openBtn.addEventListener('click', () => window.open(googleUrl, '_blank'));
+
+    function setStatus(msg, cls) {
+        statusEl.className = cls || '';
+        statusEl.innerHTML = cls === 'done' || cls === 'error' || cls === 'blocked'
+            ? msg
+            : `<span class="spinner"></span> ${msg}`;
+    }
+
+    function escHtml(s) {
+        return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Fetch via local proxy ─────────────────────────────────────────
+    let html = '';
+    try {
+        setStatus('Contacting local proxy…');
+        const proxyUrl = `${apiBase}/api/proxy_fetch?url=${encodeURIComponent(googleUrl)}`;
+        const resp = await fetch(proxyUrl);
+        if (!resp.ok) throw new Error(`Proxy returned ${resp.status}`);
+        html = await resp.text();
+    } catch (err) {
+        setStatus(`Proxy fetch failed: ${escHtml(err.message)} — <a href="${escHtml(googleUrl)}" target="_blank" style="color:var(--accent)">open manually</a>`, 'error');
+        resultsEl.style.display = 'block';
+        return;
+    }
+
+    // ── Check for CAPTCHA ────────────────────────────────────────────
+    if (html.includes('unusual traffic') || html.toLowerCase().includes('recaptcha')) {
+        setStatus('Google detected automated traffic from this IP. <a href="' + escHtml(googleUrl) + '" target="_blank" style="color:var(--accent)">Open the search manually</a> to see results.', 'blocked');
+        resultsEl.style.display = 'block';
+        return;
+    }
+
+    // ── Parse with DOMParser (browser-native, accurate selectors) ────
+    setStatus('Parsing results…');
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const results = [];
+
+    // Try selectors from newest to oldest Google HTML
+    const containerSelectors = ['div.tF2Cxc', 'div.N54PNb', 'div[data-hveid]', 'div.g'];
+    let containers = [];
+    for (const sel of containerSelectors) {
+        containers = Array.from(doc.querySelectorAll(sel));
+        if (containers.length > 0) break;
+    }
+
+    // Fallback: extract all <a><h3> pairs
+    if (containers.length === 0) {
+        const h3s = Array.from(doc.querySelectorAll('h3'));
+        for (const h3 of h3s) {
+            let el = h3.parentElement;
+            let a = null;
+            for (let i = 0; i < 6 && el; i++) {
+                a = el.tagName === 'A' ? el : el.querySelector('a[href]');
+                if (a) break;
+                el = el.parentElement;
+            }
+            if (!a) continue;
+            const href = a.getAttribute('href') || '';
+            let url = href;
+            if (href.startsWith('/url?')) {
+                const m = href.match(/[?&]q=(https?:\/\/[^&]+)/);
+                url = m ? decodeURIComponent(m[1]) : '';
+            }
+            if (!url || url.includes('google.com')) continue;
+            results.push({ url, title: h3.textContent.trim(), snippet: null });
+            if (results.length >= 10) break;
+        }
+    } else {
+        for (const c of containers.slice(0, 10)) {
+            const a     = c.querySelector('a[href]');
+            const h3    = c.querySelector('h3');
+            if (!a || !h3) continue;
+            let href = a.getAttribute('href') || '';
+            let url = href;
+            if (href.startsWith('/url?')) {
+                const m = href.match(/[?&]q=(https?:\/\/[^&]+)/);
+                url = m ? decodeURIComponent(m[1]) : '';
+            }
+            if (!url || url.startsWith('/') || url.includes('google.com')) continue;
+            const snipEl = c.querySelector('.VwiC3b, .aCOpRe, [class*="hgKElc"]');
+            results.push({
+                url,
+                title:   h3.textContent.trim(),
+                snippet: snipEl ? snipEl.textContent.trim().slice(0, 280) : null,
+            });
+        }
+    }
+
+    // ── Render results ───────────────────────────────────────────────
+    resultsEl.style.display = 'block';
+    if (results.length === 0) {
+        headingEl.textContent = 'No results parsed';
+        listEl.innerHTML = '<p class="no-results">Could not extract result links. Google HTML structure may have changed. <a href="' + escHtml(googleUrl) + '" target="_blank" style="color:var(--accent)">Open in Google</a> to view manually.</p>';
+        setStatus('Parsing complete — 0 results extracted.', 'done');
+    } else {
+        headingEl.textContent = `${results.length} result${results.length !== 1 ? 's' : ''} found`;
+        listEl.innerHTML = results.map(r => `
+            <div class="result-item">
+                <a href="${escHtml(r.url)}" target="_blank" rel="noreferrer">${escHtml(r.title)}</a>
+                <div class="url">${escHtml(r.url)}</div>
+                ${r.snippet ? `<div class="snip">${escHtml(r.snippet)}</div>` : ''}
+            </div>
+        `).join('');
+        setStatus(`Done &mdash; ${results.length} result${results.length !== 1 ? 's' : ''} sent to the AI agent.`, 'done');
+    }
+
+    // ── Report results back to server ─────────────────────────────────
+    if (jobId) {
+        try {
+            await fetch(`${apiBase}/api/native_result/${jobId}/${si}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ results }),
+            });
+        } catch (_) {
+            // Non-critical — agent already has results from requests backend
+        }
+    }
+})();
+</script>
+</body>
+</html>

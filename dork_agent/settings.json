@@ -1,0 +1,8 @@
+{
+  "small_model": "hf.co/MaziyarPanahi/Qwen3-0.6B-GGUF:Q4_K_M",
+  "large_model": "gemma3:latest",
+  "browser_backend": "native",
+  "dork_file": "C:\\Users\\b0052\\lets_dorkem\\data\\google_hacking_database.txt",
+  "review_path": "C:\\Users\\b0052\\lets_dorkem\\review.md",
+  "max_results": 5
+}

@@ -1,294 +1,1135 @@
-<!DOCTYPE html>
+﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <base href="https://example.com/">
-    <title>Q&AI Multi-Search with Enhanced Capabilities</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Dorkem Search & AI Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #121212;
-            --text-color: #ffffff;
-            --input-bg: #1e1e1e;
-            --input-focus-bg: #2a2a2a;
-            --button-bg: #1e1e1e;
-            --button-hover-bg: #2a2a2a;
+            --surface: #0d111b;
+            --surface-2: #131a2d;
+            --surface-3: #192439;
+            --text: #e6edf7;
+            --muted: #8ca1c6;
+            --accent: #61dafb;
+            --accent-2: #6bffa6;
+            --border: rgba(255, 255, 255, 0.08);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+            --radius: 24px;
         }
-        .light-mode {
-            --bg-color: #f0f0f0;
-            --text-color: #121212;
-            --input-bg: #ffffff;
-            --input-focus-bg: #e0e0e0;
-            --button-bg: #ffffff;
-            --button-hover-bg: #e0e0e0;
+
+        * {
+            box-sizing: border-box;
         }
-        body, html {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-            height: 100%;
+
+        body {
             margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(circle at top, rgba(97, 218, 251, 0.14), transparent 25%),
+                        linear-gradient(180deg, #08101a 0%, #0b1423 100%);
+            color: var(--text);
+        }
+
+        body.light-mode {
+            --surface: #ffffff;
+            --surface-2: #f4f7fb;
+            --surface-3: #eef2f8;
+            --text: #111827;
+            --muted: #4b5563;
+            --accent: #2f80ed;
+            --accent-2: #16a34a;
+            --border: rgba(15, 23, 42, 0.08);
+            background: #f8fafc;
+        }
+
+        .page-shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 20px 40px;
+        }
+
+        header.topbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .brand {
+            display: grid;
+            gap: 10px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: clamp(2rem, 3vw, 3rem);
+            letter-spacing: -0.04em;
+        }
+
+        .brand p {
+            margin: 0;
+            color: var(--muted);
+            max-width: 720px;
+            line-height: 1.6;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .topbar-actions button,
+        .hero button,
+        .panel button {
+            border: none;
+            border-radius: 999px;
+            padding: 12px 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .topbar-actions button:hover,
+        .hero button:hover,
+        .panel button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .toggle-button {
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+        }
+
+        .hero {
+            display: grid;
+            gap: 20px;
+            padding: 28px;
+            border-radius: var(--radius);
+            background: linear-gradient(135deg, rgba(97, 218, 251, 0.12), rgba(108, 93, 247, 0.08));
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .hero .search-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+        }
+
+        .hero input[type='text'] {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 18px 20px;
+            font-size: 1rem;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+        }
+
+        .hero input[type='text']::placeholder {
+            color: var(--muted);
+        }
+
+        .hero button.primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #0b1120;
+        }
+
+        .hero .engine-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .engine-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .engine-tag input {
+            accent-color: var(--accent);
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .panel h2 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .panel .panel-copy {
+            color: var(--muted);
+            margin-top: 10px;
+            line-height: 1.7;
+        }
+
+        .panel-body {
+            margin-top: 18px;
+        }
+
+        .dork-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .dork-chip {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid transparent;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .dork-chip:hover,
+        .dork-chip.selected {
+            border-color: rgba(97,218,251,0.35);
+            background: rgba(97,218,251,0.12);
+        }
+
+        .dork-chip.dbl-flash {
+            border-color: rgba(107,255,166,0.8);
+            background: rgba(107,255,166,0.2);
+            transition: all 0.08s ease;
+        }
+
+        .dork-filter {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            font-size: .9rem;
+            margin-bottom: 10px;
+        }
+        .dork-filter::placeholder { color: var(--muted); }
+
+        .dork-pager {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .dork-pager button {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            cursor: pointer;
+            font-size: .82rem;
+        }
+        .dork-pager button:disabled {
+            opacity: .35;
+            cursor: default;
+        }
+        .dork-pager .page-info {
+            font-size: .82rem;
+            color: var(--muted);
+            flex: 1;
+            text-align: center;
+        }
+
+        #agent-goal {
+            width: 100%;
+            min-height: 140px;
+            resize: vertical;
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            font-size: 0.99rem;
+            line-height: 1.6;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .result-card {
+            border-radius: 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .result-card a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .result-card p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 0.96rem;
+        }
+
+        .agent-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .agent-settings label {
+            display: block;
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .agent-settings input,
+        .agent-settings select {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px;
+            background: var(--surface-2);
+            color: var(--text);
+        }
+
+        .reasoning-card,
+        .memory-card {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            white-space: pre-wrap;
+            color: var(--text);
+        }
+
+        .reasoning-card h3,
+        .memory-card h3 {
+            margin-top: 0;
+        }
+
+        /* ---- Sub-agent progress ---- */
+        .progress-phase {
+            font-weight: 600;
+            color: var(--accent);
+            padding: 12px 0 8px;
+        }
+        .tab-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .tab-card {
+            border-radius: 14px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.85rem;
+        }
+        .tab-card .tab-dork,
+        .tab-card .tab-url {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .tab-card .tab-meta { color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
+        .tab-card.status-running { border-color: rgba(97,218,251,0.5); }
+        .tab-card.status-done { border-color: rgba(107,255,166,0.35); }
+        .tab-card.status-error { border-color: rgba(255,100,100,0.35); }
+        .relevance-high { color: #6bffa6; }
+        .relevance-medium { color: #f5c242; }
+        .relevance-low { color: #8ca1c6; }
+        .crawl-section h4 { color: var(--muted); font-size: 0.9rem; margin: 12px 0 8px; }
+
+        /* ---- Paginated URL list ---- */
+        .url-list { margin-top: 18px; }
+        .url-page-header { color: var(--muted); font-size: 0.85rem; margin: 14px 0 6px; }
+        .url-item { padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.04); margin-bottom: 6px; }
+        .url-item a { color: var(--accent); font-weight: 600; font-size: 0.95rem; text-decoration: none; }
+        .url-item .url-snippet { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(97,218,251,0.12);
+            color: var(--text);
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+        }
+
+        .status-pill.thinking {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-pill.searching {
+            background: rgba(97, 218, 251, 0.2);
+            color: #61dafb;
+        }
+
+        .status-pill.found {
+            background: rgba(107, 255, 166, 0.2);
+            color: #6bffa6;
+        }
+
+        .progress-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .notable-pages {
+            margin-top: 18px;
+        }
+
+        .notable-pages h3 {
+            margin: 0 0 12px;
+            font-size: 1.1rem;
+        }
+
+        .notable-page-item {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            gap: 4px;
+            padding: 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 10px;
         }
-        .search-container {
-            display: flex;
-            width: 75%;
-            max-width: 600px;
-            position: relative;
-            margin-bottom: 20px;
-        }
-        #search-input {
-            flex-grow: 1;
-            padding: 16px 20px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 12px 0 0 12px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        #search-input:focus {
-            outline: none;
-            background-color: var(--input-focus-bg);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        #search-button {
-            background-color: var(--button-bg);
-            border: none;
-            border-radius: 0 12px 12px 0;
-            cursor: pointer;
-            padding: 0 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        #search-button:hover {
-            background-color: var(--button-hover-bg);
-        }
-        #search-button:active {
-            transform: scale(0.95);
-        }
-        .watermark {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 1.25rem;
+
+        .notable-page-item a {
+            color: var(--accent);
+            text-decoration: none;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.1);
-            pointer-events: none;
+            font-size: 1rem;
         }
-        .tagline {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-            text-align: center;
-            color: var(--text-color);
-            letter-spacing: 0.5px;
+
+        .notable-page-item a:hover {
+            text-decoration: underline;
         }
-        .search-options {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
+
+        .notable-page-item .relevance {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            width: fit-content;
         }
-        .search-options label {
-            margin: 0 10px;
+
+        .notable-page-item .relevance.high {
+            background: rgba(107, 255, 166, 0.2);
+            color: #6bffa6;
         }
-        #autocomplete {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: var(--input-bg);
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            z-index: 10;
+
+        .notable-page-item .relevance.medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
         }
-        #autocomplete div {
-            padding: 10px;
-            cursor: pointer;
+
+        .notable-page-item .relevance.low {
+            background: rgba(255, 99, 71, 0.2);
+            color: #ff6347;
         }
-        #autocomplete div:hover {
-            background-color: var(--input-focus-bg);
+
+        .notable-page-item .summary {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
-        #voice-search {
-            background: none;
-            border: none;
-            cursor: pointer;
-            position: absolute;
-            right: 60px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        #mode-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: var(--text-color);
-            cursor: pointer;
-            font-size: 1.5rem;
-        }
-        @media (max-width: 768px) {
-            .search-container {
-                width: 90%;
+
+        @media (max-width: 960px) {
+            .section-grid {
+                grid-template-columns: 1fr;
             }
-            .tagline {
-                font-size: 1.2rem;
+        }
+
+        @media (max-width: 640px) {
+            header.topbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero {
+                padding: 20px;
+            }
+
+            .hero .search-row {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar-actions {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="watermark">Q&AI</div>
-    <button id="mode-toggle">🌓</button>
-    <div class="tagline">Search Everywhere, Answer Everything</div>
-    <div class="search-options">
-        <label><input type="checkbox" name="engine" value="google" checked> Google</label>
-        <label><input type="checkbox" name="engine" value="perplexity" checked> Perplexity AI</label>
-        <label><input type="checkbox" name="engine" value="bing"> Bing</label>
-        <label><input type="checkbox" name="engine" value="duckduckgo"> DuckDuckGo</label>
-        <label><input type="checkbox" name="engine" value="wikipedia"> Wikipedia</label>
+    <div class="page-shell">
+        <header class="topbar">
+            <div class="brand">
+                <h1>Dorkem Search & AI Dashboard</h1>
+                <p>Browse Google dorks, run AI-driven searches, and monitor crawl status in one modern interface.</p>
+            </div>
+            <div class="topbar-actions">
+                <button class="toggle-button" id="mode-toggle">Dark / Light</button>
+                <button class="toggle-button" id="refresh-dorks">Reload Dorks</button>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="search-row">
+                <input type="text" id="search-input" placeholder="Search query or prefix with G-/B-/D-/P-/W-" autofocus>
+                <button class="primary" id="search-button">Search</button>
+            </div>
+            <div class="engine-tags">
+                <label class="engine-tag"><input type="checkbox" name="engine" value="google" checked> Google</label>
+                <label class="engine-tag"><input type="checkbox" name="engine" value="perplexity" checked> Perplexity</label>
+                <label class="engine-tag"><input type="checkbox" name="engine" value="bing"> Bing</label>
+                <label class="engine-tag"><input type="checkbox" name="engine" value="duckduckgo"> DuckDuckGo</label>
+                <label class="engine-tag"><input type="checkbox" name="engine" value="wikipedia"> Wikipedia</label>
+                <button class="toggle-button" id="voice-search">Voice</button>
+            </div>
+            <p class="panel-copy">Choose your engines and search instantly, or let the AI agent select dorks and produce a results summary.</p>
+        </section>
+
+        <div class="section-grid">
+            <section class="panel" id="dork-library">
+                <div class="panel-header">
+                    <div>
+                        <h2>Dork Library</h2>
+                        <p class="panel-copy">Click a dork to select it. <strong>Double-click</strong> to add it to the search bar at the top. The AI agent can use selected dorks or build its own set.</p>
+                    </div>
+                    <button id="refresh-dorks-panel">Reload</button>
+                </div>
+                <div class="panel-body">
+                    <input type="search" class="dork-filter" id="dork-filter" placeholder="Filter dorks… (e.g. filetype:sql)">
+                    <div id="dork-count">Loading dorks...</div>
+                    <div class="dork-list" id="dork-list"></div>
+                    <div class="dork-pager" id="dork-pager" style="display:none;">
+                        <button id="dork-prev">&#8592; Prev</button>
+                        <span class="page-info" id="dork-page-info"></span>
+                        <button id="dork-next">Next &#8594;</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel" id="agent-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>AI Assistant</h2>
+                        <p class="panel-copy">Enter your objective and the agent will match dorks, search, and summarize the top results.</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="agent-settings">
+                        <label>Small model
+                            <select id="small-model"><option value="">Loading models…</option></select>
+                        </label>
+                        <label>Large model
+                            <select id="large-model"><option value="">Loading models…</option></select>
+                        </label>
+                        <label>Browser backend
+                            <select id="browser-backend">
+                                <option value="native">Native Browser (requests)</option>
+                                <option value="playwright">Playwright</option>
+                                <option value="selenium">Selenium</option>
+                                <option value="browser-use">Browser Use</option>
+                            </select>
+                        </label>
+                        <label>URLs to crawl
+                            <input type="number" id="max-crawl" value="0" min="0" max="50" title="0 = skip URL crawling wave">
+                        </label>
+                    </div>
+                    <textarea id="agent-goal" placeholder="Example: Find exposed admin pages and sensitive configuration leaks."></textarea>
+                    <div class="action-row">
+                        <button class="primary" id="run-agent">Run AI Agent</button>
+                        <button id="clear-selection">Clear Selection</button>
+                    </div>
+                    <div id="agent-progress" style="display:none;">
+                        <div class="progress-phase" id="progress-phase">Starting…</div>
+                        <div id="stream-box" style="display:none;white-space:pre-wrap;font-family:monospace;font-size:.8rem;line-height:1.5;max-height:200px;overflow-y:auto;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;margin:8px 0;color:#cdd;word-break:break-word;"></div>
+                        <div class="tab-grid" id="search-tabs"></div>
+                        <div class="crawl-section" id="crawl-section" style="display:none;">
+                            <h4>Wave 2 — URL crawls</h4>
+                            <div class="tab-grid" id="crawl-tabs"></div>
+                        </div>
+                    </div>
+                    <div id="agent-memory" class="memory-card" style="display:none;"></div>
+                    <div id="agent-reasoning" class="reasoning-card" style="display:none;"></div>
+                    <div id="agent-results"></div>
+                </div>
+            </section>
+        </div>
+
+        <section class="panel" id="crawl-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Slow Crawl Status</h2>
+                    <p class="panel-copy">View the current crawl progress and recent dorks being cached.</p>
+                </div>
+                <button id="refresh-progress">Refresh</button>
+            </div>
+            <div class="panel-body">
+                <div class="status-pill" id="crawl-status">No crawl running.</div>
+                <div class="progress-grid" id="crawl-dorks"></div>
+            </div>
+        </section>
     </div>
-    <div class="search-container">
-        <input type="text" id="search-input" placeholder="Enter your search query" autofocus>
-        <button id="voice-search">🎤</button>
-        <button id="search-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </button>
-        <div id="autocomplete"></div>
-    </div>
-    
+
     <script>
         const searchInput = document.getElementById('search-input');
         const searchButton = document.getElementById('search-button');
         const voiceSearchButton = document.getElementById('voice-search');
-        const autocompleteDiv = document.getElementById('autocomplete');
         const modeToggle = document.getElementById('mode-toggle');
+        const refreshDorksButton = document.getElementById('refresh-dorks');
+        const refreshDorksPanelButton = document.getElementById('refresh-dorks-panel');
+        const refreshProgressButton = document.getElementById('refresh-progress');
 
+        const dorkListSection = document.getElementById('dork-list');
+        const dorkCount = document.getElementById('dork-count');
+        const dorkFilter = document.getElementById('dork-filter');
+        const dorkPager = document.getElementById('dork-pager');
+        const dorkPrevBtn = document.getElementById('dork-prev');
+        const dorkNextBtn = document.getElementById('dork-next');
+        const dorkPageInfo = document.getElementById('dork-page-info');
+        const runAgentButton = document.getElementById('run-agent');
+        const clearSelectionButton = document.getElementById('clear-selection');
+        const agentGoal = document.getElementById('agent-goal');
+        const agentResults = document.getElementById('agent-results');
+        const agentMemory = document.getElementById('agent-memory');
+        const agentReasoning = document.getElementById('agent-reasoning');
+        const agentProgress = document.getElementById('agent-progress');
+        const progressPhase = document.getElementById('progress-phase');
+        const streamBox = document.getElementById('stream-box');
+        const searchTabsDiv = document.getElementById('search-tabs');
+        const crawlSection = document.getElementById('crawl-section');
+        const crawlTabsDiv = document.getElementById('crawl-tabs');
+        const smallModelInput = document.getElementById('small-model');
+        const largeModelInput = document.getElementById('large-model');
+        const browserBackendInput = document.getElementById('browser-backend');
+        const maxCrawlInput = document.getElementById('max-crawl');
+        const crawlStatus = document.getElementById('crawl-status');
+        const crawlDorks = document.getElementById('crawl-dorks');
+        const autocompleteDiv = document.createElement('div');
+
+        let allDorks = [];
+        let selectedDorks = [];
+        let _dorkPage = 0;
+        const _DORKS_PER_PAGE = 50;
+        let _lastCrawlStatus = '';
         let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 
-        searchButton.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                performSearch();
+        const apiBase = window.location.origin === 'null' ? 'http://127.0.0.1:8000' : window.location.origin;
+
+        const searchRow = document.querySelector('.hero .search-row');
+        searchRow.appendChild(autocompleteDiv);
+        autocompleteDiv.style.position = 'absolute';
+        autocompleteDiv.style.left = '0';
+        autocompleteDiv.style.right = '0';
+        autocompleteDiv.style.top = '100%';
+        autocompleteDiv.style.background = 'rgba(255,255,255,0.04)';
+        autocompleteDiv.style.border = '1px solid rgba(255,255,255,0.08)';
+        autocompleteDiv.style.borderRadius = '14px';
+        autocompleteDiv.style.zIndex = '10';
+        autocompleteDiv.style.display = 'none';
+
+        async function apiGet(path) {
+            const response = await fetch(apiBase + path);
+            if (!response.ok) throw new Error(`Failed to fetch ${path}`);
+            return response.json();
+        }
+
+        async function apiPost(path, body) {
+            const response = await fetch(apiBase + path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || `POST ${path} failed`);
             }
-        });
-        searchInput.addEventListener('input', showAutocomplete);
-        voiceSearchButton.addEventListener('click', startVoiceSearch);
-        modeToggle.addEventListener('click', toggleMode);
+            return response.json();
+        }
 
-        function performSearch() {
-            let input = searchInput.value;
-            let query = input;
-            let searchEngines = getSelectedEngines();
+        function updateDorkCount() {
+            const filtered = _getFilteredDorks();
+            const sel = selectedDorks.length;
+            dorkCount.textContent = `${allDorks.length} dorks total · ${filtered.length} shown · ${sel} selected.`;
+        }
 
-            if (input.startsWith('G-')) {
-                searchEngines = ['google'];
-                query = input.slice(2).trim();
-            } else if (input.startsWith('P-')) {
-                searchEngines = ['perplexity'];
-                query = input.slice(2).trim();
-            } else if (input.startsWith('B-')) {
-                searchEngines = ['bing'];
-                query = input.slice(2).trim();
-            } else if (input.startsWith('D-')) {
-                searchEngines = ['duckduckgo'];
-                query = input.slice(2).trim();
-            } else if (input.startsWith('W-')) {
-                searchEngines = ['wikipedia'];
-                query = input.slice(2).trim();
-            }
+        function _getFilteredDorks() {
+            const q = dorkFilter ? dorkFilter.value.trim().toLowerCase() : '';
+            if (!q) return allDorks;
+            return allDorks.filter(d => d.toLowerCase().includes(q));
+        }
 
-            query = encodeURIComponent(query);
+        function renderDorkList() {
+            const filtered = _getFilteredDorks();
+            const totalPages = Math.max(1, Math.ceil(filtered.length / _DORKS_PER_PAGE));
+            if (_dorkPage >= totalPages) _dorkPage = totalPages - 1;
+            const start = _dorkPage * _DORKS_PER_PAGE;
+            const page = filtered.slice(start, start + _DORKS_PER_PAGE);
 
-            if (query) {
-                searchEngines.forEach(engine => {
-                    let url;
-                    switch(engine) {
-                        case 'google':
-                            url = `https://www.google.com/search?q=${query}`;
-                            break;
-                        case 'perplexity':
-                            url = `https://www.perplexity.ai/search/new?q=${query}`;
-                            break;
-                        case 'bing':
-                            url = `https://www.bing.com/search?q=${query}`;
-                            break;
-                        case 'duckduckgo':
-                            url = `https://duckduckgo.com/?q=${query}`;
-                            break;
-                        case 'wikipedia':
-                            url = `https://en.wikipedia.org/wiki/Special:Search?search=${query}`;
-                            break;
+            dorkListSection.innerHTML = '';
+            page.forEach(dork => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'dork-chip' + (selectedDorks.includes(dork) ? ' selected' : '');
+                chip.textContent = dork;
+                chip.addEventListener('click', () => {
+                    // Toggle without rebuilding the whole list — just flip this chip
+                    if (selectedDorks.includes(dork)) {
+                        selectedDorks = selectedDorks.filter(d => d !== dork);
+                        chip.classList.remove('selected');
+                    } else {
+                        selectedDorks.push(dork);
+                        chip.classList.add('selected');
                     }
-                    window.open(url, '_blank');
+                    updateDorkCount();
+                });
+                chip.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    searchInput.value = dork;
+                    searchInput.focus();
+                    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    chip.classList.add('dbl-flash');
+                    setTimeout(() => chip.classList.remove('dbl-flash'), 500);
+                });
+                dorkListSection.appendChild(chip);
+            });
+
+            // Pager
+            if (totalPages > 1) {
+                dorkPager.style.display = 'flex';
+                dorkPageInfo.textContent = `Page ${_dorkPage + 1} / ${totalPages}  (${start + 1}–${Math.min(start + _DORKS_PER_PAGE, filtered.length)} of ${filtered.length})`;
+                dorkPrevBtn.disabled = _dorkPage === 0;
+                dorkNextBtn.disabled = _dorkPage >= totalPages - 1;
+            } else {
+                dorkPager.style.display = 'none';
+            }
+            updateDorkCount();
+        }
+
+        function toggleDork(dork) {
+            // Legacy — now handled inline in renderDorkList chips
+            selectedDorks = selectedDorks.includes(dork)
+                ? selectedDorks.filter(item => item !== dork)
+                : [...selectedDorks, dork];
+            renderDorkList();
+        }
+
+        async function fetchDorks() {
+            try {
+                const data = await apiGet('/api/dorks');
+                allDorks = data.dorks || [];
+                renderDorkList();
+            } catch (error) {
+                dorkCount.textContent = 'Unable to load dorks.';
+                console.warn(error);
+            }
+        }
+
+        async function fetchProgress() {
+            try {
+                const progress = await apiGet('/api/progress');
+                crawlStatus.textContent = `Status: ${progress.status} · Page ${progress.current_page}/${progress.total_pages} · Dorks: ${progress.dorks_found}`;
+                crawlDorks.innerHTML = (progress.dork_samples || []).map(dork => `<span class="dork-chip selected">${dork}</span>`).join('');
+
+                // Auto-refresh dork library when a fresh crawl completes
+                const newStatus = progress.status || '';
+                if (newStatus === 'complete' && _lastCrawlStatus !== 'complete') {
+                    fetchDorks();
+                }
+                _lastCrawlStatus = newStatus;
+            } catch (error) {
+                crawlStatus.textContent = 'Unable to load crawl progress.';
+                console.warn(error);
+            }
+        }
+
+        function escHtml(s) {
+            return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function renderTabCard(tab, type) {
+            const st = tab.status || 'running';
+            const card = document.createElement('div');
+            card.className = `tab-card status-${st}`;
+            if (type === 'search') {
+                card.innerHTML = `<span class="tab-dork" title="${escHtml(tab.dork||'')}">${escHtml((tab.dork||'').slice(0,60))}</span>
+                    <span class="tab-meta">${st==='running'?'Searching…':st==='error'?'Error: '+escHtml((tab.error||'').slice(0,50)):tab.result_count+' results · '+tab.elapsed+'s'}</span>`;
+            } else {
+                const rel = tab.relevance||'unknown';
+                card.innerHTML = `<span class="tab-url" title="${escHtml(tab.url||'')}">${escHtml((tab.title||tab.url||'').slice(0,60))}</span>
+                    <span class="tab-meta">${st==='running'?'Crawling…':'<span class="relevance-'+rel+'">'+rel.toUpperCase()+'</span> · '+tab.elapsed+'s'}</span>`;
+            }
+            return card;
+        }
+
+        function renderProgress(job) {
+            if (!job || job.status==='done' || job.status==='error') return;
+            agentProgress.style.display = 'block';
+            progressPhase.textContent = job.message || 'Working…';
+
+            // Streaming text (shown during planning phase, hidden once wave1 starts)
+            const text = job.stream_text || '';
+            if (job.phase === 'planning' && text) {
+                streamBox.style.display = 'block';
+                streamBox.textContent = text;
+                // Auto-scroll to bottom
+                streamBox.scrollTop = streamBox.scrollHeight;
+            } else {
+                streamBox.style.display = 'none';
+                streamBox.textContent = '';
+            }
+
+            searchTabsDiv.innerHTML = '';
+            (job.tabs||[]).forEach(t => searchTabsDiv.appendChild(renderTabCard(t,'search')));
+            const cTabs = job.crawl_tabs||[];
+            if (cTabs.length) {
+                crawlSection.style.display = 'block';
+                crawlTabsDiv.innerHTML = '';
+                cTabs.forEach(t => crawlTabsDiv.appendChild(renderTabCard(t,'crawl')));
+            }
+        }
+
+        function renderAgentResults(result) {
+            agentProgress.style.display = 'none';
+            streamBox.style.display = 'none';
+            agentMemory.style.display = 'none';
+            agentReasoning.style.display = 'none';
+            if (!result || !result.findings) {
+                agentResults.innerHTML = '<p style="color:#f99">No results returned.</p>';
+                return;
+            }
+
+            // Memory + reasoning cards
+            if (result.memory_summary) {
+                agentMemory.style.display = 'block';
+                agentMemory.innerHTML = `<h3>Agent Memory</h3><div>${escHtml(result.memory_summary).replace(/\n/g,'<br>')}</div>`;
+            }
+            if (result.reasoning) {
+                agentReasoning.style.display = 'block';
+                agentReasoning.innerHTML = `<h3>Agent Reasoning</h3><div>${escHtml(result.reasoning).replace(/\n/g,'<br>')}</div>`;
+            }
+
+            const totalResults = result.findings.reduce((s,f)=>s+(f.results||[]).length,0);
+            const goalHdr = `<div style="margin-bottom:16px">
+                <h3 style="margin:0 0 4px">${escHtml(result.goal||'')}</h3>
+                <p style="color:var(--muted);margin:0">${(result.selected_dorks||[]).length} dork(s) · ${totalResults} result(s) found</p>
+            </div>`;
+
+            // Crawl results (wave 2)
+            let crawlHtml = '';
+            const highMed = (result.crawl_results||[]).filter(r=>r.relevance==='high'||r.relevance==='medium');
+            if (highMed.length) {
+                crawlHtml = '<h4 style="margin:16px 0 8px">Top Crawled Pages</h4><div class="url-list">' +
+                    highMed.slice(0,10).map(r=>`
+                    <div class="url-item">
+                        <a href="${escHtml(r.url)}" target="_blank" rel="noreferrer">${escHtml(r.title||r.url)}</a>
+                        <span class="relevance-${r.relevance}" style="margin-left:8px;font-size:.75rem">${r.relevance.toUpperCase()}</span>
+                        ${r.summary?`<div class="url-snippet">${escHtml(r.summary)}</div>`:''}
+                    </div>`).join('') + '</div>';
+            }
+
+            // Paginated URL list
+            let urlHtml = '';
+            if ((result.paginated_urls||[]).length) {
+                urlHtml = '<h4 style="margin:16px 0 8px">All URLs Found</h4><div class="url-list">';
+                result.paginated_urls.forEach((page,pi)=>{
+                    urlHtml += `<div class="url-page-header">Page ${pi+1} (${page.length} URL${page.length!==1?'s':''})</div>`;
+                    page.forEach(item=>{
+                        urlHtml += `<div class="url-item"><a href="${escHtml(item.url)}" target="_blank" rel="noreferrer">${escHtml(item.title||item.url)}</a>${item.snippet?`<div class="url-snippet">${escHtml(item.snippet)}</div>`:''}</div>`;
+                    });
+                });
+                urlHtml += '</div>';
+            }
+
+            // Per-dork findings
+            let findingsHtml = '<h4 style="color:var(--muted);margin:20px 0 10px">Results by Dork</h4>';
+            if (totalResults === 0) {
+                findingsHtml += '<p style="color:#f99;margin:8px 0">No Google results were returned. Google may have blocked the searches — try a different browser backend or reduce the number of queries.</p>';
+            }
+            result.findings.forEach(item => {
+                const hits = (item.results||[]);
+                findingsHtml += `<div class="result-card" style="margin-bottom:14px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                        <strong style="flex:1;word-break:break-all">${escHtml(item.query)}</strong>
+                        <span style="font-size:.75rem;color:var(--muted);white-space:nowrap">${hits.length} result${hits.length!==1?'s':''}</span>
+                    </div>
+                    ${item.error ? `<p style="color:#f66;margin:4px 0">Error: ${escHtml(item.error)}</p>` : ''}
+                    ${hits.length===0 ? '<p style="color:var(--muted);margin:4px 0;font-size:.85rem">No results returned for this dork.</p>' :
+                        hits.map(h=>`<div style="margin:4px 0 8px;padding-left:10px;border-left:2px solid rgba(255,255,255,.1)">
+                            <a href="${escHtml(h.url||'')}" target="_blank" rel="noreferrer" style="display:block;word-break:break-all">${escHtml(h.title||h.url||'(no title)')}</a>
+                            ${h.snippet?`<p style="color:var(--muted);font-size:.82rem;margin:2px 0">${escHtml(h.snippet)}</p>`:''}
+                        </div>`).join('')}
+                </div>`;
+            });
+
+            agentResults.innerHTML = goalHdr + crawlHtml + urlHtml + findingsHtml;
+        }
+
+        async function fetchSettings() {
+            try {
+                const [settingsData, modelsData] = await Promise.all([
+                    apiGet('/api/settings'),
+                    apiGet('/api/models').catch(() => ({ models: [] })),
+                ]);
+                const settings = settingsData.settings || {};
+                const models = modelsData.models || [];
+
+                // Populate model dropdowns
+                [smallModelInput, largeModelInput].forEach(sel => {
+                    const current = sel === smallModelInput
+                        ? (settings.small_model || '')
+                        : (settings.large_model || '');
+                    sel.innerHTML = '';
+                    if (models.length === 0) {
+                        const opt = document.createElement('option');
+                        opt.value = current;
+                        opt.textContent = current || 'No models found — enter manually';
+                        sel.appendChild(opt);
+                        // Allow manual entry by converting to datalist
+                    } else {
+                        if (current && !models.includes(current)) {
+                            const opt = document.createElement('option');
+                            opt.value = current;
+                            opt.textContent = current;
+                            sel.appendChild(opt);
+                        }
+                        models.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m;
+                            opt.textContent = m;
+                            if (m === current) opt.selected = true;
+                            sel.appendChild(opt);
+                        });
+                        if (current) sel.value = current;
+                    }
                 });
 
-                addToSearchHistory(input);
+                browserBackendInput.value = settings.browser_backend || 'playwright';
+            } catch (error) {
+                console.warn('Could not load settings', error);
             }
+        }
+
+        let _pollInterval = null;
+        const _openedBrowserTabs = new Set();
+
+        async function runAgent() {
+            const goal = agentGoal.value.trim();
+            if (!goal && selectedDorks.length === 0) {
+                agentResults.innerHTML = '<p>Please add a goal or select one or more dorks.</p>';
+                return;
+            }
+            if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; }
+            agentProgress.style.display = 'block';
+            crawlSection.style.display = 'none';
+            streamBox.style.display = 'none';
+            streamBox.textContent = '';
+            searchTabsDiv.innerHTML = '';
+            crawlTabsDiv.innerHTML = '';
+            progressPhase.textContent = 'Starting agent…';
+            agentResults.innerHTML = '';
+            agentMemory.style.display = 'none';
+            agentReasoning.style.display = 'none';
+            runAgentButton.disabled = true;
+            runAgentButton.textContent = 'Running…';
+            _openedBrowserTabs.clear();
+            try {
+                const { job_id } = await apiPost('/api/search', {
+                    goal, selected_dorks: selectedDorks, max_selections: 10,
+                    max_crawl: parseInt(maxCrawlInput.value,10)||0,
+                    small_model: smallModelInput.value,
+                    large_model: largeModelInput.value,
+                    browser_backend: browserBackendInput.value,
+                });
+                _pollInterval = setInterval(async () => {
+                    try {
+                        const job = await apiGet(`/api/jobs/${job_id}`);
+                        renderProgress(job);
+
+                        // Open new browser tabs for each search URL the agent emits
+                        (job.browser_urls || []).forEach(entry => {
+                            const key = entry.id !== undefined ? String(entry.id) : entry.bridge_url;
+                            if (!_openedBrowserTabs.has(key)) {
+                                _openedBrowserTabs.add(key);
+                                const tabUrl = entry.bridge_url || entry.search_url || '';
+                                if (tabUrl) window.open(tabUrl, `dorkem_tab_${key}`);
+                            }
+                        });
+
+                        if (job.status === 'done') {
+                            clearInterval(_pollInterval); _pollInterval = null;
+                            runAgentButton.disabled = false; runAgentButton.textContent = 'Run AI Agent';
+                            renderAgentResults(job.result);
+                        } else if (job.status === 'error') {
+                            clearInterval(_pollInterval); _pollInterval = null;
+                            runAgentButton.disabled = false; runAgentButton.textContent = 'Run AI Agent';
+                            agentProgress.style.display = 'none';
+                            agentResults.innerHTML = `<p style="color:#f66">Error: ${escHtml(job.error||'Unknown')}</p>`;
+                        }
+                    } catch(e) { console.warn('Poll error',e); }
+                }, 1000);
+            } catch(err) {
+                runAgentButton.disabled = false; runAgentButton.textContent = 'Run AI Agent';
+                agentProgress.style.display = 'none';
+                agentResults.innerHTML = `<p style="color:#f66">Error: ${escHtml(err.message)}</p>`;
+            }
+        }
+
+        function addToSearchHistory(query) {
+            if (!searchHistory.includes(query)) {
+                searchHistory.unshift(query);
+                if (searchHistory.length > 10) searchHistory.pop();
+                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+            }
+        }
+
+        function showAutocomplete() {
+            const value = searchInput.value.toLowerCase();
+            if (value.length < 2) {
+                autocompleteDiv.style.display = 'none';
+                return;
+            }
+            const matches = searchHistory.filter(item => item.toLowerCase().includes(value));
+            if (!matches.length) {
+                autocompleteDiv.style.display = 'none';
+                return;
+            }
+            autocompleteDiv.style.display = 'block';
+            autocompleteDiv.innerHTML = matches.map(item => `<div style="padding: 12px; cursor: pointer;">${item}</div>`).join('');
+            autocompleteDiv.querySelectorAll('div').forEach(el => {
+                el.addEventListener('click', () => {
+                    searchInput.value = el.textContent;
+                    autocompleteDiv.style.display = 'none';
+                });
+            });
         }
 
         function getSelectedEngines() {
             return Array.from(document.querySelectorAll('input[name="engine"]:checked')).map(input => input.value);
         }
 
-        function showAutocomplete() {
-            const input = searchInput.value.toLowerCase();
-            if (input.length < 2) {
-                autocompleteDiv.innerHTML = '';
-                return;
+        function performSearch() {
+            const raw = searchInput.value.trim();
+            if (!raw) return;
+            addToSearchHistory(raw);
+
+            let query = raw;
+            let engines = getSelectedEngines();
+            const prefix = raw.slice(0, 2).toUpperCase();
+            const forceMap = { 'G-': 'google', 'P-': 'perplexity', 'B-': 'bing', 'D-': 'duckduckgo', 'W-': 'wikipedia' };
+            if (forceMap[prefix]) {
+                engines = [forceMap[prefix]];
+                query = raw.slice(2).trim();
             }
 
-            const matches = searchHistory.filter(item => item.toLowerCase().includes(input));
-            autocompleteDiv.innerHTML = matches.map(item => `<div>${item}</div>`).join('');
-
-            autocompleteDiv.querySelectorAll('div').forEach(div => {
-                div.addEventListener('click', function() {
-                    searchInput.value = this.textContent;
-                    autocompleteDiv.innerHTML = '';
-                });
+            const encoded = encodeURIComponent(query);
+            engines.forEach(engine => {
+                let url = '';
+                switch (engine) {
+                    case 'google': url = `https://www.google.com/search?q=${encoded}`; break;
+                    case 'perplexity': url = `https://www.perplexity.ai/search/new?q=${encoded}`; break;
+                    case 'bing': url = `https://www.bing.com/search?q=${encoded}`; break;
+                    case 'duckduckgo': url = `https://duckduckgo.com/?q=${encoded}`; break;
+                    case 'wikipedia': url = `https://en.wikipedia.org/wiki/Special:Search?search=${encoded}`; break;
+                }
+                if (url) window.open(url, '_blank');
             });
         }
 
-        function addToSearchHistory(query) {
-            if (!searchHistory.includes(query)) {
-                searchHistory.unshift(query);
-                if (searchHistory.length > 10) {
-                    searchHistory.pop();
-                }
-                localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
-            }
-        }
-
         function startVoiceSearch() {
-            if ('webkitSpeechRecognition' in window) {
-                const recognition = new webkitSpeechRecognition();
-                recognition.lang = 'en-US';
-                recognition.start();
-
-                recognition.onresult = function(event) {
-                    searchInput.value = event.results[0][0].transcript;
-                    performSearch();
-                };
-            } else {
-                alert('Voice recognition is not supported in your browser.');
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Voice search is not supported by this browser.');
+                return;
             }
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.start();
+            recognition.onresult = event => {
+                searchInput.value = event.results[0][0].transcript;
+                performSearch();
+            };
         }
 
         function toggleMode() {
             document.body.classList.toggle('light-mode');
-            modeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '🌓';
         }
+
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') performSearch(); });
+        searchInput.addEventListener('input', showAutocomplete);
+        voiceSearchButton.addEventListener('click', startVoiceSearch);
+        modeToggle.addEventListener('click', toggleMode);
+        refreshDorksButton.addEventListener('click', fetchDorks);
+        refreshDorksPanelButton.addEventListener('click', fetchDorks);
+        refreshProgressButton.addEventListener('click', fetchProgress);
+        runAgentButton.addEventListener('click', runAgent);
+        clearSelectionButton.addEventListener('click', () => {
+            selectedDorks = [];
+            renderDorkList();
+        });
+
+        // Dork library filter + pager
+        if (dorkFilter) {
+            dorkFilter.addEventListener('input', () => { _dorkPage = 0; renderDorkList(); });
+        }
+        if (dorkPrevBtn) dorkPrevBtn.addEventListener('click', () => { _dorkPage--; renderDorkList(); dorkListSection.scrollIntoView({behavior:'smooth', block:'start'}); });
+        if (dorkNextBtn) dorkNextBtn.addEventListener('click', () => { _dorkPage++; renderDorkList(); dorkListSection.scrollIntoView({behavior:'smooth', block:'start'}); });
+
+        window.addEventListener('load', () => {
+            fetchSettings();
+            fetchDorks();
+            fetchProgress();
+            setInterval(fetchProgress, 5000);
+        });
     </script>
 </body>
 </html>

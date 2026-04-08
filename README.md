@@ -76,6 +76,84 @@ Here's a snippet from the provided HTML-based search engine code:
 2. **Utilize the HTML-Based Search Engine**: Use the provided HTML file to test the multi-search capabilities and other features.
 3. **Experiment and Learn**: Apply the examples and techniques to your own searches and adapt them to your needs.
 
+## Automating Google Dork Discovery
+
+A new Python-based agent has been added to this repository to automate Google Dork selection, browser search execution, and report generation.
+
+### What it does
+
+- Loads a local Google Hacking Database dataset from `data/google_hacking_database.txt`
+- Uses a small local Ollama model to capture or refine the search objective
+- Uses a larger local Ollama model to select the most relevant dorks for the goal
+- Executes browser-based Google searches and scrapes the top result links
+- Writes a structured `review.md` report containing selected dorks and notable pages
+
+### How to run
+
+1. Install Python dependencies:
+
+```bash
+pip install -r requirements.txt
+playwright install
+```
+
+> If you want the newest browser automation experience, install `browser-use` as well. It is already included in `requirements.txt`.
+
+2. Run the setup wizard first to configure models and backend support:
+
+```bash
+python setup_dork_agent.py
+```
+
+3. Start the interactive UI server:
+
+```bash
+python ui_server.py
+```
+
+4. Open your browser to `http://127.0.0.1:8000/Index.html`.
+
+5. Optionally run the slow crawl wizard to extract dorks from Exploit-DB page-by-page:
+
+```bash
+python crawl_wizard.py
+```
+
+6. Refresh remote Google dork sources to cache additional search rules:
+
+```bash
+python run_dork_agent.py --refresh-sources
+```
+
+5. Browse the available dorks from local and remote sources:
+
+```bash
+python run_dork_agent.py --browse-dorks --limit 50
+```
+
+6. Run the agent to generate a `review.md` report:
+
+```bash
+python run_dork_agent.py --goal "Find exposed admin portals and configuration leaks" --max-selections 8
+```
+
+6. Open the generated `review.md` to review selected dorks, results, and notable links.
+
+### Testing
+
+Run the built-in tests with:
+
+```bash
+python -m unittest discover tests
+```
+
+### Notes
+
+- The agent assumes local Ollama CLI models are available and on your PATH.
+- You can choose the browser automation backend: `playwright`, `selenium`, or `browser-use`.
+- If you prefer Selenium instead of Playwright, use `--browser-backend selenium`.
+- Expand `data/google_hacking_database.txt` with more Exploit-DB queries for broader coverage.
+
 ## Contributing
 
 Contributions are welcome! If you have additional Google Dorks, examples, or suggestions for improvements, please submit a pull request or open an issue. Your input helps enhance the repository and benefits the community.
